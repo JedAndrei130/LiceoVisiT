@@ -1,0 +1,43 @@
+.admin-container{
+display:flex;
+background:#f8fafc;
+min-height:100vh;
+}
+
+.main{
+flex:1;
+margin-left:260px;
+display:flex;
+flex-direction:column;
+}
+
+.topbar{
+height:64px;
+background:white;
+border-bottom:1px solid #e2e8f0;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 30px;
+}
+
+.topbar h1{
+font-size:20px;
+font-weight:600;
+color:#334155;
+}
+
+.user{
+width:34px;
+height:34px;
+border-radius:50%;
+background:#fdf2f2;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#800000;
+}
+
+.content{
+padding:30px;
+}

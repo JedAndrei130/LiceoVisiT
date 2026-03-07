@@ -1,0 +1,80 @@
+<div class="table-card">
+
+<div class="table-controls">
+
+<input
+type="text"
+placeholder="Search by name..."
+[(ngModel)]="searchTerm"
+class="search"
+/>
+
+<div class="actions">
+
+<button class="btn">Print Records</button>
+
+<button class="btn">Export CSV</button>
+
+</div>
+
+</div>
+
+<div class="filters">
+
+<select [(ngModel)]="campusFilter">
+<option value="all">All Campuses</option>
+<option>Main Campus</option>
+<option>RnP Campus</option>
+<option>Paseo Del Rio Campus</option>
+</select>
+
+<input type="date" [(ngModel)]="startDate">
+
+<input type="date" [(ngModel)]="endDate">
+
+</div>
+
+
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Visitor Name</th>
+<th>ID Photo</th>
+<th>Campus</th>
+<th>Purpose</th>
+<th>Date</th>
+<th>Time In</th>
+<th>Time Out</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr *ngIf="visitors.length === 0">
+
+<td colspan="9" class="empty">
+
+<div class="empty-box">
+
+<div class="icon">👤</div>
+
+<h3>No visitors found</h3>
+
+<p>Try adjusting your search or filter criteria</p>
+
+</div>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
