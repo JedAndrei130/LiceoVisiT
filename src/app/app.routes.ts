@@ -3,10 +3,12 @@ import { VisitorFormComponent } from './visitor-form/visitor-form.component';
 import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AdminVisitorsComponent } from './admin-visitors/admin-visitors.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
 
 export const routes: Routes = [
   { path: '', component: VisitorFormComponent },
-  { path: 'admin/login', component: AdminLoginComponent },
+  { path: 'login', component: AdminLoginComponent },
   { path: 'admin', component: DashboardComponent },
-  { path: 'admin/visitors', component: AdminVisitorsComponent }
+  { path: 'visitors', component: AdminVisitorsComponent },
+  { path: 'users', component: AdminUsersComponent}
 ];
