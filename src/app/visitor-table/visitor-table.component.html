@@ -1,80 +1,154 @@
 <div class="table-card">
 
-<div class="table-controls">
+  <div class="table-controls">
+    <input
+      type="text"
+      placeholder="Search by name..."
+      [(ngModel)]="searchTerm"
+      class="search"
+    />
+    <div class="actions">
+      <button class="btn" (click)="printRecords()">🖨 Print Records</button>
+      <button class="btn" (click)="exportCSV()">📥 Export CSV</button>
+      <button class="btn btn-refresh" (click)="loadVisitors()">↻ Refresh</button>
+    </div>
+  </div>
 
-<input
-type="text"
-placeholder="Search by name..."
-[(ngModel)]="searchTerm"
-class="search"
-/>
+  <div class="filters">
+    <select [(ngModel)]="campusFilter">
+      <option value="all">All Campuses</option>
+      @for (campus of uniqueCampuses; track campus) {
+        <option [value]="campus">{{ campus }}</option>
+      }
+    </select>
+    <input type="date" [(ngModel)]="startDate" title="From date" />
+    <input type="date" [(ngModel)]="endDate" title="To date" />
+    <button class="btn btn-clear" (click)="startDate=''; endDate=''; campusFilter='all'; searchTerm=''">
+      Clear Filters
+    </button>
+  </div>
 
-<div class="actions">
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="empty-box state-box">
+      <div class="icon">⏳</div>
+      <h3>Loading visitors...</h3>
+    </div>
+  }
 
-<button class="btn">Print Records</button>
+  <!-- Error State -->
+  @if (errorMessage() && !isLoading()) {
+    <div class="empty-box state-box">
+      <div class="icon">⚠️</div>
+      <h3>{{ errorMessage() }}</h3>
+      <button class="btn" (click)="loadVisitors()">Retry</button>
+    </div>
+  }
 
-<button class="btn">Export CSV</button>
+  <!-- Table -->
+  @if (!isLoading() && !errorMessage()) {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Visitor Name</th>
+            <th>ID Photo</th>
+            <th>Campus</th>
+            <th>Purpose</th>
+            <th>Staff</th>
+            <th>Date</th>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Empty state -->
+          @if (filteredVisitors.length === 0) {
+            <tr>
+              <td colspan="11" class="empty">
+                <div class="empty-box">
+                  <div class="icon">👤</div>
+                  <h3>No visitors found</h3>
+                  <p>Try adjusting your search or filter criteria</p>
+                </div>
+              </td>
+            </tr>
+          }
+
+          <!-- Data rows -->
+          @for (v of filteredVisitors; track v.visitor_id) {
+            <tr [class.row-active]="isActive(v)">
+              <td>{{ v.visitor_id }}</td>
+              <td class="visitor-name">{{ v.visitor_name }}</td>
+              <td>
+                @if (v.photo) {
+                  <img
+                    [src]="v.photo"
+                    alt="ID Photo"
+                    class="id-photo"
+                    (click)="openPhoto(v.photo)"
+                    title="Click to view full size"
+                  />
+                } @else {
+                  <span class="no-photo">—</span>
+                }
+              </td>
+              <td>{{ v.campus_name }}</td>
+              <td>{{ v.purpose }}</td>
+              <td>{{ v.staff_name }}</td>
+              <td>{{ v.date_time_in | date: 'MMM d, y' }}</td>
+              <td>{{ v.date_time_in | date: 'h:mm a' }}</td>
+              <td>{{ v.date_time_out ? (v.date_time_out | date: 'h:mm a') : '—' }}</td>
+              <td>
+                <span class="badge" [class.badge-active]="isActive(v)" [class.badge-out]="!isActive(v)">
+                  {{ isActive(v) ? 'On-Site' : 'Checked Out' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                @if (isActive(v)) {
+                  <button
+                    class="btn btn-checkout"
+                    (click)="checkOut(v.visitor_id)"
+                    [disabled]="checkingOutId() === v.visitor_id"
+                  >
+                    {{ checkingOutId() === v.visitor_id ? '...' : '✓ Check Out' }}
+                  </button>
+                }
+                <button
+                  class="btn btn-danger"
+                  (click)="deleteVisitor(v.visitor_id)"
+                  [disabled]="isDeletingId() === v.visitor_id"
+                  [class.deleting]="isDeletingId() === v.visitor_id"
+                >
+                  {{ isDeletingId() === v.visitor_id ? '🗑 Deleting...' : '🗑 Delete' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Count -->
+  @if (!isLoading() && !errorMessage()) {
+    <div class="table-footer">
+      Showing {{ filteredVisitors.length }} of {{ visitors.length }} records
+    </div>
+  }
 
 </div>
 
-</div>
-
-<div class="filters">
-
-<select [(ngModel)]="campusFilter">
-<option value="all">All Campuses</option>
-<option>Main Campus</option>
-<option>RnP Campus</option>
-<option>Paseo Del Rio Campus</option>
-</select>
-
-<input type="date" [(ngModel)]="startDate">
-
-<input type="date" [(ngModel)]="endDate">
-
-</div>
-
-
-<table>
-
-<thead>
-
-<tr>
-<th>ID</th>
-<th>Visitor Name</th>
-<th>ID Photo</th>
-<th>Campus</th>
-<th>Purpose</th>
-<th>Date</th>
-<th>Time In</th>
-<th>Time Out</th>
-<th>Actions</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr *ngIf="visitors.length === 0">
-
-<td colspan="9" class="empty">
-
-<div class="empty-box">
-
-<div class="icon">👤</div>
-
-<h3>No visitors found</h3>
-
-<p>Try adjusting your search or filter criteria</p>
-
-</div>
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
+<!-- ─── LIGHTBOX ─────────────────────────────────────────────────────── -->
+@if (selectedPhoto()) {
+  <div class="lightbox" (click)="closePhoto()">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <button class="lightbox-close" (click)="closePhoto()">✕</button>
+      <img [src]="selectedPhoto()!" alt="ID Photo Full Size" />
+      <p class="lightbox-hint">Press ESC or click outside to close</p>
+    </div>
+  </div>
+}

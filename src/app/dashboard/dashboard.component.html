@@ -3,59 +3,77 @@
   <app-sidebar></app-sidebar>
 
   <div class="main">
-    
+
     <header class="topbar">
-
       <h2>Dashboard</h2>
-
       <div class="top-actions">
-        <button class="add-btn" routerLink="/">+ Add Visitor</button>
+        <span class="last-updated" *ngIf="lastUpdated">Updated: {{ lastUpdated }}</span>
+        <button class="refresh-btn" (click)="loadAll()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">↻ Refresh</span>
+          <span *ngIf="isLoading">Loading...</span>
+        </button>
+        <a class="add-btn" routerLink="/">+ Add Visitor</a>
         <div class="user-icon">👤</div>
       </div>
-
     </header>
 
     <main class="content">
 
-      <!-- ✅ ROUTER OUTLET (IMPORTANT) -->
-      <router-outlet></router-outlet>
+      <!-- LOADING SPINNER -->
+      <div *ngIf="isLoading" class="loading-bar"></div>
 
-      <!-- DASHBOARD DEFAULT CONTENT -->
-      <!-- You can keep this OR move it to a separate component -->
-
+      <!-- STATS CARDS -->
       <div class="stats">
         <div class="stat-card red">
+          <div class="stat-icon">📋</div>
           <p>Total Visitors Today</p>
-          <h1>{{visitorsToday}}</h1>
+          <h1>{{ visitorsToday }}</h1>
         </div>
-
         <div class="stat-card green">
+          <div class="stat-icon">🟢</div>
           <p>Currently On-Site</p>
-          <h1>{{activeVisitors}}</h1>
+          <h1>{{ activeVisitors }}</h1>
         </div>
-
         <div class="stat-card orange">
+          <div class="stat-icon">📁</div>
           <p>Total Records</p>
-          <h1>{{totalRecords}}</h1>
+          <h1>{{ totalRecords }}</h1>
         </div>
       </div>
 
+      <!-- CHARTS -->
       <div class="charts">
 
+        <!-- Bar Chart: Visitor Trends -->
         <div class="chart-card">
           <h3>Visitor Trends</h3>
           <p>Daily visitors over the past 7 days</p>
-          <div class="chart-placeholder"></div>
+          <div class="canvas-wrap">
+            <canvas #trendCanvas id="trendCanvas"></canvas>
+          </div>
         </div>
 
+        <!-- Doughnut Chart: Visit Purpose -->
         <div class="chart-card">
           <h3>Visit Purpose</h3>
           <p>Distribution of all visits</p>
-          <div class="chart-placeholder"></div>
+          <div class="canvas-wrap purpose-wrap">
+            <canvas #purposeCanvas id="purposeCanvas"></canvas>
+          </div>
+          <!-- Legend -->
+          <div class="legend" *ngIf="purposeLegend.length > 0">
+            <div class="legend-item" *ngFor="let item of purposeLegend">
+              <span class="legend-dot" [style.background]="item.color"></span>
+              <span class="legend-label">{{ item.label }}</span>
+              <span class="legend-pct">{{ item.pct }}</span>
+            </div>
+          </div>
+          <div class="no-data" *ngIf="purposeLegend.length === 0 && !isLoading">No purpose data yet.</div>
         </div>
 
       </div>
 
+      <!-- RECENT VISITS TABLE -->
       <div class="recent-visits">
 
         <div class="table-header">
@@ -63,25 +81,38 @@
             <h3>Recent Visits</h3>
             <p>Latest visitor check-ins</p>
           </div>
-
-          <button class="view-btn">View All →</button>
+          <a class="view-btn" routerLink="/visitors">View All →</a>
         </div>
 
-        <table>
+        <!-- Empty state -->
+        <div *ngIf="recentVisits.length === 0 && !isLoading" class="empty">
+          <p>No recent visitors found.</p>
+        </div>
+
+        <table *ngIf="recentVisits.length > 0">
           <thead>
             <tr>
               <th>Visitor</th>
               <th>Campus</th>
               <th>Purpose</th>
-              <th>Date & Time</th>
+              <th>Date &amp; Time</th>
               <th>Status</th>
             </tr>
           </thead>
-
           <tbody>
-            <tr *ngIf="recentVisits.length === 0">
-              <td colspan="5" class="empty">
-                No recent visitors found.
+            <tr *ngFor="let v of recentVisits">
+              <td>
+                <div class="visitor-name">{{ v.visitor_name }}</div>
+              </td>
+              <td>{{ v.campus_name }}</td>
+              <td>{{ v.purpose }}</td>
+              <td>
+                {{ v.date_time_in | date: 'MMM d, y · h:mm a' }}
+              </td>
+              <td>
+                <span class="badge" [class.badge-active]="isActive(v)" [class.badge-out]="!isActive(v)">
+                  {{ isActive(v) ? 'On-Site' : 'Checked Out' }}
+                </span>
               </td>
             </tr>
           </tbody>

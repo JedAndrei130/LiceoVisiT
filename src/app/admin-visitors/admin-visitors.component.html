@@ -1,25 +1,21 @@
 <div class="admin-container">
 
-<app-sidebar></app-sidebar>
+  <app-sidebar></app-sidebar>
 
-<div class="main">
+  <div class="main">
 
-<header class="topbar">
+    <header class="topbar">
+      <h1>Visitor Management</h1>
+      <div class="top-actions">
+        <a routerLink="/" class="add-btn">+ Check In Visitor</a>
+        <div class="user">👤</div>
+      </div>
+    </header>
 
-<h1>Visitor Management</h1>
+    <main class="content">
+      <app-visitor-table></app-visitor-table>
+    </main>
 
-<div class="user">
-👤
-</div>
-
-</header>
-
-<main class="content">
-
-<app-visitor-table></app-visitor-table>
-
-</main>
-
-</div>
+  </div>
 
 </div>
