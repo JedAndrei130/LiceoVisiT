@@ -9,7 +9,7 @@
       <h2>User Management</h2>
       <div class="top-actions">
         <button class="add-btn" (click)="openAdd()">+ Add User</button>
-        <div class="user-icon">👤</div>
+        <div class="user-icon"><app-user-menu></app-user-menu></div>
       </div>
     </header>
 
@@ -78,7 +78,7 @@
                   <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
                   <td>{{ user.position || '—' }}</td>
-                  <td>{{ user.created_at | date: 'MMM d, y' }}</td>
+                  <td>{{ user.created_date | date: 'MMM d, y' }}</td>
                   <td>
                     <button class="btn-edit" (click)="edit(user)">Edit</button>
                     <button class="btn-delete" (click)="delete(user.user_id)">Delete</button>
@@ -126,6 +126,37 @@
         <div class="form-group">
           <label>Position / Role</label>
           <input type="text" [(ngModel)]="formData.position" placeholder="e.g. Security Guard, Admin">
+        </div>
+
+        <!-- Password section divider -->
+        <div class="password-divider">
+          <span>{{ editingUser ? 'Change Password (optional)' : 'Set Password *' }}</span>
+        </div>
+
+        <div class="form-group">
+          <label>{{ editingUser ? 'New Password' : 'Password *' }}</label>
+          <div class="input-password-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="formData.password"
+              [placeholder]="editingUser ? 'Leave blank to keep current password' : 'Min. 6 characters'">
+            <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password {{ editingUser ? '' : '*' }}</label>
+          <div class="input-password-wrapper">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              [(ngModel)]="confirmPassword"
+              [placeholder]="editingUser ? 'Confirm new password' : 'Re-enter password'">
+            <button type="button" class="toggle-pw" (click)="showConfirmPassword = !showConfirmPassword">
+              {{ showConfirmPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
         </div>
 
       </div>

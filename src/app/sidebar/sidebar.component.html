@@ -1,39 +1,28 @@
 <div class="sidebar">
 
     <div class="logo">
-
         <img src="ico-liceo-big.png" alt="">
         <div>
             <h3>Liceo VisiTrack</h3>
             <p>Admin Portal</p>
         </div>
-
     </div>
-
 
     <nav>
-
         <a routerLink="/admin" routerLinkActive="active">Dashboard</a>
-
         <a routerLink="/visitors" routerLinkActive="active">Visitors</a>
-
         <a routerLink="/users" routerLinkActive="active">User Management</a>
-
     </nav>
 
-
     <div class="admin">
-
-        <div class="avatar">AD</div>
-
+        <div class="avatar">{{ initials }}</div>
         <div>
-            <p>Admin User</p>
-            <span>System Administrator</span>
+            <p>{{ user?.name || 'Admin User' }}</p>
+            <span>{{ user?.position || 'Administrator' }}</span>
         </div>
-
     </div>
 
-    <button class="logout" routerLink="/login">
+    <button class="logout" (click)="signOut()">
         Sign Out
     </button>
 

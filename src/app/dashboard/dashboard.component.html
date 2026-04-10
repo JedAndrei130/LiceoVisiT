@@ -7,20 +7,24 @@
     <header class="topbar">
       <h2>Dashboard</h2>
       <div class="top-actions">
-        <span class="last-updated" *ngIf="lastUpdated">Updated: {{ lastUpdated }}</span>
-        <button class="refresh-btn" (click)="loadAll()" [disabled]="isLoading">
-          <span *ngIf="!isLoading">↻ Refresh</span>
-          <span *ngIf="isLoading">Loading...</span>
+        @if (lastUpdated()) {
+          <span class="last-updated">Updated: {{ lastUpdated() }}</span>
+        }
+        <button class="refresh-btn" (click)="loadAll()" [disabled]="isLoading()">
+          @if (!isLoading()) { <span>↻ Refresh</span> }
+          @if (isLoading())  { <span>Loading...</span> }
         </button>
         <a class="add-btn" routerLink="/">+ Add Visitor</a>
-        <div class="user-icon">👤</div>
+        <div class="user-icon"><app-user-menu></app-user-menu></div>
       </div>
     </header>
 
     <main class="content">
 
       <!-- LOADING SPINNER -->
-      <div *ngIf="isLoading" class="loading-bar"></div>
+      @if (isLoading()) {
+        <div class="loading-bar"></div>
+      }
 
       <!-- STATS CARDS -->
       <div class="stats">
@@ -61,14 +65,20 @@
             <canvas #purposeCanvas id="purposeCanvas"></canvas>
           </div>
           <!-- Legend -->
-          <div class="legend" *ngIf="purposeLegend.length > 0">
-            <div class="legend-item" *ngFor="let item of purposeLegend">
-              <span class="legend-dot" [style.background]="item.color"></span>
-              <span class="legend-label">{{ item.label }}</span>
-              <span class="legend-pct">{{ item.pct }}</span>
+          @if (purposeLegend.length > 0) {
+            <div class="legend">
+              @for (item of purposeLegend; track item.label) {
+                <div class="legend-item">
+                  <span class="legend-dot" [style.background]="item.color"></span>
+                  <span class="legend-label">{{ item.label }}</span>
+                  <span class="legend-pct">{{ item.pct }}</span>
+                </div>
+              }
             </div>
-          </div>
-          <div class="no-data" *ngIf="purposeLegend.length === 0 && !isLoading">No purpose data yet.</div>
+          }
+          @if (purposeLegend.length === 0 && !isLoading()) {
+            <div class="no-data">No purpose data yet.</div>
+          }
         </div>
 
       </div>
@@ -85,38 +95,44 @@
         </div>
 
         <!-- Empty state -->
-        <div *ngIf="recentVisits.length === 0 && !isLoading" class="empty">
-          <p>No recent visitors found.</p>
-        </div>
+        @if (recentVisits.length === 0 && !isLoading()) {
+          <div class="empty">
+            <p>No recent visitors found.</p>
+          </div>
+        }
 
-        <table *ngIf="recentVisits.length > 0">
-          <thead>
-            <tr>
-              <th>Visitor</th>
-              <th>Campus</th>
-              <th>Purpose</th>
-              <th>Date &amp; Time</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let v of recentVisits">
-              <td>
-                <div class="visitor-name">{{ v.visitor_name }}</div>
-              </td>
-              <td>{{ v.campus_name }}</td>
-              <td>{{ v.purpose }}</td>
-              <td>
-                {{ v.date_time_in | date: 'MMM d, y · h:mm a' }}
-              </td>
-              <td>
-                <span class="badge" [class.badge-active]="isActive(v)" [class.badge-out]="!isActive(v)">
-                  {{ isActive(v) ? 'On-Site' : 'Checked Out' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        @if (recentVisits.length > 0) {
+          <table>
+            <thead>
+              <tr>
+                <th>Visitor</th>
+                <th>Campus</th>
+                <th>Purpose</th>
+                <th>Date &amp; Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of recentVisits; track v.visitor_id) {
+                <tr>
+                  <td>
+                    <div class="visitor-name">{{ v.visitor_name }}</div>
+                  </td>
+                  <td>{{ v.campus_name }}</td>
+                  <td>{{ v.purpose }}</td>
+                  <td>
+                    {{ v.date_time_in | date: 'MMM d, y · h:mm a' }}
+                  </td>
+                  <td>
+                    <span class="badge" [class.badge-active]="isActive(v)" [class.badge-out]="!isActive(v)">
+                      {{ isActive(v) ? 'On-Site' : 'Checked Out' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
 
       </div>
 

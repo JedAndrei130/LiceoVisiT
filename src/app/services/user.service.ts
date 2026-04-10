@@ -7,19 +7,21 @@ export interface User {
   name: string;
   email: string;
   position: string;
-  created_at?: string;
+  created_date?: string;
 }
 
 export interface CreateUser {
   name: string;
   email: string;
   position: string;
+  password?: string;       // required on create, optional on edit
 }
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private http = inject(HttpClient);
   private API_URL = 'http://localhost:3001/users';
+  private AUTH_URL = 'http://localhost:3001/auth';
 
   // Singleton cache — survives route changes
   cachedUsers: User[] = [];
@@ -40,5 +42,14 @@ export class UserService {
 
   deleteUser(id: number) {
     return lastValueFrom(this.http.delete<{ message: string }>(`${this.API_URL}/${id}`));
+  }
+
+  login(email: string, password: string) {
+    return lastValueFrom(
+      this.http.post<{ message: string; user: Omit<User, 'created_at'> }>(
+        `${this.AUTH_URL}/login`,
+        { email, password }
+      )
+    );
   }
 }

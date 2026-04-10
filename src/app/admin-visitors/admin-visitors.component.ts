@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { VisitorTableComponent } from '../visitor-table/visitor-table.component';
+import { UserMenuComponent } from '../user-menu/user-menu.component';
 
 @Component({
   selector: 'app-admin-visitors',
   standalone: true,
-  imports: [CommonModule, RouterLink, SidebarComponent, VisitorTableComponent],
+  imports: [CommonModule, RouterLink, SidebarComponent, VisitorTableComponent, UserMenuComponent],
   templateUrl: './admin-visitors.component.html',
   styleUrls: ['./admin-visitors.component.scss']
 })

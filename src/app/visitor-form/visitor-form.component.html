@@ -2,97 +2,104 @@
 
   <!-- SUCCESS MESSAGE -->
   @if (isSubmitted()) {
-  <div class="success-container">
-    <div class="success-card">
-      <div class="icon">✔</div>
-      <h2>Check-In Successful</h2>
-      <p>Thank you, {{formData.name}}. Your visit has been recorded.</p>
-      <button (click)="resetForm()" class="primary-btn">
-        Check In Another Visitor
-      </button>
+    <div class="success-container">
+      <div class="success-card">
+        <div class="icon">✔</div>
+        <h2>Check-In Successful</h2>
+        <p>Thank you, {{ formData.name }}. Your visit has been recorded.</p>
+        <button (click)="resetForm()" class="primary-btn">
+          Check In Another Visitor
+        </button>
+      </div>
     </div>
-  </div>
   }
 
   <!-- FORM -->
-  <div *ngIf="!isSubmitted()" class="card">
+  @if (!isSubmitted()) {
+    <div class="card">
 
-    <div class="header">
-      <img src="ico-liceo-big.png" alt="">
-      <h1>Liceo VisiTrack</h1>
+      <div class="header">
+        <img src="ico-liceo-big.png" alt="">
+        <h1>Liceo VisiTrack</h1>
+      </div>
+
+      <form (submit)="$event.preventDefault()">
+
+        <!-- ERROR MESSAGE -->
+        @if (errorMessage()) {
+          <div class="error-alert">
+            ⚠️ {{ errorMessage() }}
+          </div>
+        }
+
+        <!-- NAME -->
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" [(ngModel)]="formData.name"
+                 placeholder="Enter your full name" required>
+        </div>
+
+        <!-- CAMPUS -->
+        <div class="form-group">
+          <label>Campus</label>
+          <select name="campus" [(ngModel)]="formData.campus">
+          @for (campus of campusOptions; track campus) {
+            <option [value]="campus">{{ campus }}</option>
+          }
+          </select>
+        </div>
+
+        <!-- PURPOSE -->
+        <div class="form-group">
+          <label>Purpose of Visit</label>
+          <select name="purpose" [(ngModel)]="formData.purpose">
+          @for (p of purposeOptions; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+          </select>
+        </div>
+
+        <!-- DATE & TIME -->
+        <div class="row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" name="date" [(ngModel)]="formData.date" required>
+          </div>
+          <div class="form-group">
+            <label>Time In</label>
+            <input type="time" name="timeIn" [(ngModel)]="formData.timeIn" required>
+          </div>
+        </div>
+
+        <!-- PHOTO UPLOAD -->
+        <div class="form-group">
+          <label>Valid ID Photo *</label>
+          <div class="upload-box">
+            <input type="file" (change)="onPhotoUpload($event)" accept="image/*">
+            <p>Click or drag photo to upload</p>
+            <small>JPG, PNG up to 5MB</small>
+          </div>
+        </div>
+
+        <button type="button" class="submit-btn"
+                (click)="submitForm()"
+                [disabled]="isSubmitting()"
+                [class.submitting]="isSubmitting()">
+          {{ isSubmitting() ? 'Submitting...' : 'Submit Entry' }}
+        </button>
+
+        <p class="note">
+          Only visitors can fill up this information.
+        </p>
+
+      </form>
+
     </div>
-
-    <form (submit)="$event.preventDefault()">
-
-      <!-- ERROR MESSAGE -->
-      <div *ngIf="errorMessage" class="error-alert">
-        ⚠️ {{ errorMessage }}
-      </div>
-
-      <!-- NAME -->
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" name="name" [(ngModel)]="formData.name" placeholder="Enter your full name" required>
-      </div>
-
-      <!-- CAMPUS -->
-      <div class="form-group">
-        <label>Campus</label>
-        <select name="campus" [(ngModel)]="formData.campus">
-          <option *ngFor="let campus of campusOptions" [value]="campus">
-            {{campus}}
-          </option>
-        </select>
-      </div>
-
-      <!-- PURPOSE -->
-      <div class="form-group">
-        <label>Purpose of Visit</label>
-        <select name="purpose" [(ngModel)]="formData.purpose">
-          <option *ngFor="let p of purposeOptions" [value]="p">
-            {{p}}
-          </option>
-        </select>
-      </div>
-
-      <!-- DATE & TIME -->
-      <div class="row">
-        <div class="form-group">
-          <label>Date</label>
-          <input type="date" name="date" [(ngModel)]="formData.date" required>
-        </div>
-        <div class="form-group">
-          <label>Time In</label>
-          <input type="time" name="timeIn" [(ngModel)]="formData.timeIn" required>
-        </div>
-      </div>
-
-      <!-- PHOTO UPLOAD -->
-      <div class="form-group">
-        <label>Valid ID Photo *</label>
-        <div class="upload-box">
-          <input type="file" (change)="onPhotoUpload($event)" accept="image/*">
-          <p>Click or drag photo to upload</p>
-          <small>JPG, PNG up to 5MB</small>
-        </div>
-      </div>
-
-      <button type="button" class="submit-btn" (click)="submitForm()" [disabled]="isSubmitting"
-        [class.submitting]="isSubmitting">
-        {{ isSubmitting ? 'Submitting...' : 'Submit Entry' }}
-      </button>
-
-      <p class="note">
-        Only visitors can fill up this information.
-      </p>
-
-    </form>
-
-  </div>
+  }
 
   <nav>
     <a routerLink="/login" class="admin-access">
-      ● Admin Access
+      &#9679; Admin Access
     </a>
   </nav>
 

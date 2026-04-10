@@ -20,7 +20,9 @@ export class VisitorService {
     }
 
     public async createVisitor(payload: CreateVisitor) {
-        return lastValueFrom(this.http.post<{ message: string; id: number }>(this.API_URL, payload));
+        const result = await lastValueFrom(this.http.post<{ message: string; id: number }>(this.API_URL, payload));
+        this.cachedVisitors = []; // invalidate so next load fetches fresh
+        return result;
     }
 
     public async checkOutVisitor(id: number, dateTimeOut: string) {

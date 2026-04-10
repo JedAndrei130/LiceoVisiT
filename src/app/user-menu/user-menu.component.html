@@ -1,0 +1,40 @@
+<div class="user-menu-wrapper">
+
+  <!-- Avatar Button -->
+  <button class="avatar-btn" (click)="toggle()" [attr.aria-expanded]="isOpen()" title="Account menu">
+    <span class="avatar-initials">{{ initials }}</span>
+  </button>
+
+  <!-- Dropdown Panel -->
+  @if (isOpen()) {
+    <div class="dropdown" (click)="$event.stopPropagation()">
+
+      <!-- User Info Header -->
+      <div class="dropdown-header">
+        <div class="avatar-lg">{{ initials }}</div>
+        <div class="user-info">
+          <p class="user-name">{{ user?.name || 'Unknown' }}</p>
+          <p class="user-position">{{ user?.position || '—' }}</p>
+          <p class="user-email">{{ user?.email || '' }}</p>
+        </div>
+      </div>
+
+      <div class="dropdown-divider"></div>
+
+      <!-- Actions -->
+      <button class="dropdown-item" (click)="editProfile()">
+        <span class="item-icon">✏️</span>
+        Edit Profile
+      </button>
+
+      <div class="dropdown-divider"></div>
+
+      <button class="dropdown-item sign-out" (click)="signOut()">
+        <span class="item-icon">🚪</span>
+        Sign Out
+      </button>
+
+    </div>
+  }
+
+</div>

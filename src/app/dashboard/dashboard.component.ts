@@ -1,16 +1,17 @@
 import {
   Component, OnInit, OnDestroy, AfterViewInit,
-  ViewChild, ElementRef, ChangeDetectorRef
+  ViewChild, ElementRef, ChangeDetectorRef, signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { DashboardService, TrendPoint, PurposePoint } from '../services/dashboard.service';
+import { UserMenuComponent } from '../user-menu/user-menu.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, RouterLink, RouterOutlet],
+  imports: [CommonModule, SidebarComponent, RouterLink, RouterOutlet, UserMenuComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -22,8 +23,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   activeVisitors = 0;
   totalRecords = 0;
   recentVisits: any[] = [];
-  isLoading = false;
-  lastUpdated = '';
+  isLoading  = signal(false);
+  lastUpdated = signal('');
 
   trendData: TrendPoint[] = [];
   purposeData: PurposePoint[] = [];
@@ -47,7 +48,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.activeVisitors = cached.activeVisitors;
       this.totalRecords = cached.totalRecords;
       this.recentVisits = cached.recentVisits;
-      this.lastUpdated = 'Cached';
+      this.lastUpdated.set('Cached');
     }
 
     // Fetch live data right away
@@ -70,7 +71,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   async loadAll() {
     // Only show spinner on first load when there is no data yet
     if (this.totalRecords === 0 && this.recentVisits.length === 0) {
-      this.isLoading = true;
+      this.isLoading.set(true);
     }
     try {
       const [stats, trends, purposes] = await Promise.all([
@@ -85,9 +86,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.recentVisits = stats.recentVisits;
       this.trendData = trends;
       this.purposeData = purposes;
-      this.lastUpdated = new Date().toLocaleTimeString();
+      this.lastUpdated.set(new Date().toLocaleTimeString());
       this.dataReady = true;
-      this.cdr.detectChanges(); // ensure *ngIf bound canvases are in DOM
+      this.cdr.detectChanges();
 
       if (this.viewReady) {
         this.scheduleChartDraw();
@@ -95,7 +96,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
@@ -123,7 +124,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
+      // Use local date parts (not UTC) to match stored local-time datetimes
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const key = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
       const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const found = this.trendData.find(t => t.visit_date?.slice(0, 10) === key);
       days.push({ label, count: found ? Number(found.count) : 0 });

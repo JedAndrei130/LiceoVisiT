@@ -293,3 +293,52 @@ td {
   0%, 100% { opacity: 0.8; }
   50%       { opacity: 0.5; }
 }
+
+/* PASSWORD DIVIDER */
+.password-divider {
+  display: flex;
+  align-items: center;
+  margin: 10px 0 16px;
+  gap: 10px;
+
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #800000;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+}
+
+/* PASSWORD INPUT WITH TOGGLE */
+.input-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    flex: 1;
+    padding-right: 42px !important;
+  }
+
+  .toggle-pw {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+    color: #64748b;
+    &:hover { color: #334155; }
+  }
+}
