@@ -75,7 +75,10 @@
         <div class="form-group">
           <label>Valid ID Photo *</label>
           <div class="upload-box">
-            <input type="file" (change)="onPhotoUpload($event)" accept="image/*">
+            @if (formData.photoId) {
+              <img [src]="formData.photoId" class="photo-preview" alt="Preview">
+            }
+            <input class="upload-input" type="file" (change)="onPhotoUpload($event)" accept="image/*">
             <p>Click or drag photo to upload</p>
             <small>JPG, PNG up to 5MB</small>
           </div>
